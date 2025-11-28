@@ -4,7 +4,16 @@ The app displays real-time weather information including temperature, humidity, 
 
 ---
 
-## ✨ Features
+## 🚀 Features
+
+- 🌍 Real-time weather information
+- 📍 Auto location detection via GPS
+- 🔍 Search weather by city
+- ⚙️ Clean Architecture (Data → Domain → Presentation)
+- ⚡ Lightning-fast API calls using **Dio**
+- 🔒 Secure API key handling with Interceptors
+- 🧭 GetX state management & dependency injection
+- 🛑 Robust error + exception handling
 
 ### 🔹 **Real-Time Weather Data**
 - Fetches live weather from OpenWeather API
@@ -55,6 +64,7 @@ The app displays real-time weather information including temperature, humidity, 
 ### **API**
 - **OpenWeather API**
 - HTTPS GET requests
+- **DIO with Interceptors**
 - JSON parsing & model mapping
 
 ### **Architecture**
