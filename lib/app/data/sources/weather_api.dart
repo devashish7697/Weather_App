@@ -27,7 +27,7 @@ class WeatherApi {
           "lat" : latitude.toString(),
           "lon" : longitude.toString(),
           "appid" : apiKey,
-          "units" : "metric"
+          "units" : "metric",
         },
         converter: (json) => CurrentWeatherModel.fromJson(json)
     );

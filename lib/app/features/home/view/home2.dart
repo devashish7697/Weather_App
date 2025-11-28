@@ -14,20 +14,18 @@ class Home2 extends GetView<HomeController> {
     // getting current hour for Day and time
     DateTime now = DateTime.now();
     int currentHour = now.hour;
+    bool day = (currentHour >= 6 && currentHour < 18);
+
+    //getting dynamic size
+    final size = MediaQuery.of(context).size;
+    final h = size.height / 100;
+    final w = size.width /100;
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: Container(
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFF5494b2).withOpacity(1),
-              Color(0xFF7da8be).withOpacity(0.6),// light sky blue
-              Color(0xFFa6bdca).withOpacity(0.3),   // deep blue
-            ],
-          ),
+          gradient: day ? dayGradient() : nightGradient(),
         ),
 
         child: SafeArea(
@@ -48,24 +46,45 @@ class Home2 extends GetView<HomeController> {
                   Center(
                     child: Text( controller.errorMessage.value,
                       style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 20
+                          color: Colors.white,
+                          fontSize: 18,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),
-                  TextField(
-                    controller: controller.searchController,
-                    decoration: InputDecoration(
-                        hintText: 'search city',
-                        hintStyle: TextStyle(
+                  SizedBox(height: 3*h,),
+                  Padding(
+                    padding: EdgeInsets.only(left: 10 * w, right: 10 * w),
+                    child: TextField(
+                      controller: controller.searchController,
+                      style: TextStyle(
                           color: Colors.white,
-                          fontSize: 14
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                      ),
+                      decoration: InputDecoration(
+                          hintText: 'search city',
+                          hintStyle: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16
+                          ),
+                          prefixIcon: Icon(Icons.search_outlined,color: Colors.white,),
+                        enabledBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Colors.white,
+                          )
                         ),
-                        prefixIcon: Icon(Icons.search_outlined,color: Colors.white,)
+                        focusedBorder: UnderlineInputBorder(
+                           borderSide: BorderSide(
+                                color: Colors.white,
+                           )
+                        )
+                      ),
+                      onSubmitted: (_){
+                        controller.CityWeather();
+                      },
                     ),
-                    onSubmitted: (_){
-                      controller.loadCityWeather();
-                    },
                   )
 
                 ],
@@ -84,7 +103,7 @@ class Home2 extends GetView<HomeController> {
 
   }
 
-  // ----------------- WEATHER SCREEN -------------------------------------
+  // ----------------- WEATHER SCREEN ----------------------------
   Widget buildWeatherScreen(
     BuildContext context ,{
     required TextEditingController searchController,
@@ -94,6 +113,7 @@ class Home2 extends GetView<HomeController> {
     final size = MediaQuery.of(context).size;
     final h = size.height / 100;
     final w = size.width /100;
+    bool day = (currentHour >= 6 && currentHour < 18);
     return Padding(
               padding: EdgeInsets.only(left: 5 * w, top: 5 * h, right: 5 * w),
               child: Column(
@@ -180,7 +200,7 @@ class Home2 extends GetView<HomeController> {
                       Expanded(
                         flex: 4,
                         child: Image.asset(
-                          (currentHour >= 6 && currentHour < 18) ? 'assets/weather/01d.png' : 'assets/weather/01n.png',
+                          day ? 'assets/weather/01d.png' : 'assets/weather/01n.png',
                           width: 10 * w,
                           height: 10 * h,
                         ),
@@ -242,11 +262,12 @@ class Home2 extends GetView<HomeController> {
                       children: [
 
                         weatherInfoCard(
-                            iconPath: 'assets/icons/windspeed.png',
-                            value: weather.windSpeed.toString()+' km/h',
-                            textPadding: 1,
+                          iconPath: 'assets/icons/windspeed.png',
+                          value: weather.windSpeed.toString()+' km/h',
+                          textPadding: 1,
                           h: h,
                           w: w,
+                          day: day,
                         ),
                         SizedBox(width: 6 * w,),
                         weatherInfoCard(
@@ -255,6 +276,7 @@ class Home2 extends GetView<HomeController> {
                           textPadding: 6,
                           h: h,
                           w: w,
+                          day: day,
                         ),
                         SizedBox(width: 6 * w,),
                         weatherInfoCard(
@@ -263,6 +285,7 @@ class Home2 extends GetView<HomeController> {
                           textPadding: 6,
                           h: h,
                           w: w,
+                          day: day,
                         )
                       ],
                     ),
@@ -287,14 +310,14 @@ class Home2 extends GetView<HomeController> {
                         customColors: CustomSliderColors(
                           progressBarColor: Colors.blue.shade200,
                           trackColor: Colors.white,
-                          shadowColor: Colors.black12,
+                          shadowColor: Colors.white.withOpacity(0.5),
                           shadowMaxOpacity: 0.4,
                         ),
                         infoProperties: InfoProperties(
-                          mainLabelStyle: const TextStyle(
-                            color: Colors.black,
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
+                          mainLabelStyle: TextStyle(
+                            color: day ? Colors.black54 : Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
                           ),
                           modifier: (value) =>
                           "${value.toInt()}% Humidity",
@@ -344,17 +367,13 @@ class Home2 extends GetView<HomeController> {
     );
   }
 
-  String date(){
-   final now =  DateTime.now();
-   return DateFormat('MMMM d, yyyy').format(now);
-  }
-
   Widget weatherInfoCard({
     required final String iconPath,
     required final String value,
     required final textPadding,
     required final double h,
     required final double w,
+    required bool day,
 
 }){
     return Container(
@@ -396,9 +415,9 @@ class Home2 extends GetView<HomeController> {
             child: Text(
               value,
               style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w400
+                  color: day ? Colors.black : Colors.white,
+                  fontSize: 15,
+                  fontWeight: day ? FontWeight.w400 : FontWeight.w600
               ),
             ),
           )
@@ -416,8 +435,8 @@ class Home2 extends GetView<HomeController> {
         color: Colors.white.withOpacity(0.15),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [BoxShadow(
-          color: Colors.white.withOpacity(0.5),
-          blurRadius: 5,
+          color: Colors.white.withOpacity(0.7),
+          blurRadius: 3,
           spreadRadius: 0,
         )]
       ),
@@ -439,6 +458,40 @@ class Home2 extends GetView<HomeController> {
         ],
       ),
     );
+  }
+
+  // ------------ Gradient According to Day and night -------------------
+  Gradient dayGradient(){
+    return LinearGradient(
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter,
+      colors: [
+        Color(0xFF5494b2).withOpacity(1),
+        Color(0xFF7da8be).withOpacity(0.6),// light sky blue
+        Color(0xFFa6bdca).withOpacity(0.3),   // deep blue
+      ],
+    );
+  }
+
+  Gradient nightGradient(){
+    return LinearGradient(
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter,
+      colors: [
+        //Color(0xFF0f1221).withOpacity(1),
+        Color(0xFF2b385a),
+        Color(0xFF496394).withOpacity(0.6),
+        Color(0xFF496394).withOpacity(0.5),
+
+        //Color(0xFF496394).withOpacity(1),
+        //Color(0xFF0f1221).withOpacity(1),// deep blue
+      ],
+    );
+  }
+
+  String date(){
+    final now =  DateTime.now();
+    return DateFormat('MMMM d, yyyy').format(now);
   }
 
 }
